@@ -1,0 +1,11 @@
+{
+  "resource": "/{proxy+}",
+  "path": "/path/to/resource",
+  "httpMethod": "GET",
+  "queryStringParameters": {
+    "foo": "bar"
+  },
+  "pathParameters": {
+    "proxy": "/path/to/resource"
+  }
+}

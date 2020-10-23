@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SSR React
+
+Globals:
+  Function:
+    Timeout: 10
+
+Resources:
+  ExpressBackend:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: server.default
+      Runtime: nodejs12.x
+      Events:
+        HelloWorld:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: get
+
+Outputs:
+  ExpressBackendApi:
+    Description: API Gateway endpoint URL for Prod stage for ExpressBackend function
+    Value:
+      Fn::Sub: https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/
+  ExpressBackendFunction:
+    Description: Express Backend Lambda Function ARN
+    Value: !Sub ExpressBackend.Arn
+  ExpressBackendIamRole:
+    Description: Implicit IAM Role created for ExpressBackend function
+    Value: !Sub ExpressBackendFunctionRole.Arn

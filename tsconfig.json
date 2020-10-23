@@ -3,7 +3,7 @@
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "target": "es2015",
-    "jsx": "preserve",
+    "jsx": "react",
     "types": [
       "react"
     ],

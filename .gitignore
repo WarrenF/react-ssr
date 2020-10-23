@@ -1,4 +1,6 @@
-node_modules
 .DS_Store
-public
+.aws-sam
+dist
+node_modules
+samconfig.toml
 server.js

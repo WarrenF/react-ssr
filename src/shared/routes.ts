@@ -3,14 +3,14 @@ import Home from './components/Home'
 import List from './components/List'
 import { fetchPopularRepos } from './api'
 
-export type IType = {
+type IRoutes = {
 	path: string,
 	exact?: boolean
 	component: React.FC<any>,
 	fetchInitialData?: (path: string) => Promise<any>
 }
 
-const routes: IType[] =  [
+const routes: IRoutes[] =  [
   {
     path: '/',
     exact: true,
