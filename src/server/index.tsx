@@ -54,4 +54,9 @@ app.get('*', async (req, res, next) => {
 
 if (process.env.LOCAL_DEV) app.listen(3000, () => { console.log('Server is running on http://localhost:3000') })
 
-export default serverless(app)
+export default serverless(
+	app,
+	{
+		binary: ['*/*']
+	}
+)
