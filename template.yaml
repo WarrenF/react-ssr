@@ -2,11 +2,47 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: SSR React
 
+Parameters:
+  Subdomain:
+    Type: String
+    Default: react-ssr
+  DomainName:
+    Description: "Main domain name"
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /warren_dev/domain_name
+  CertificateArn:
+    Description: "ARN for domain certificate"
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /warren_dev/subdomain_cert_arn
+  HostedZoneId:
+    Description: "Route 53 Hosted Zone ID"
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /warren_dev/host_zone_id
+
 Globals:
   Function:
     Timeout: 10
 
 Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Domain:
+        CertificateArn: !Ref CertificateArn
+        DomainName:
+          Fn::Sub:
+            - "${subdomain}.${domain}"
+            - {
+                subdomain: !Ref Subdomain,
+                domain: !Ref DomainName
+              }
+        Route53:
+          HostedZoneId: !Ref HostedZoneId
+        EndpointConfiguration: REGIONAL
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 200 # Handle up to 200 requests in any 1ms
+        ThrottlingRateLimit: 500 # Handle up to 500 requests per second
+
   ExpressBackend:
     Type: AWS::Serverless::Function
     Properties:
@@ -14,20 +50,20 @@ Resources:
       Handler: server.default
       Runtime: nodejs12.x
       Events:
-        HelloWorld:
+        Website:
           Type: HttpApi
           Properties:
-            Path: /{proxy+}
-            Method: get
+            ApiId: !Ref HttpApi
+            Path: /{proxy+} # Handle all routes
+            Method: get # Handle only get requests
 
 Outputs:
   ExpressBackendApi:
-    Description: API Gateway endpoint URL for Prod stage for ExpressBackend function
+    Description: Website URL
     Value:
-      Fn::Sub: https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/
-  ExpressBackendFunction:
-    Description: Express Backend Lambda Function ARN
-    Value: !Sub ExpressBackend.Arn
-  ExpressBackendIamRole:
-    Description: Implicit IAM Role created for ExpressBackend function
-    Value: !Sub ExpressBackendFunctionRole.Arn
+      Fn::Sub:
+        - "https://${subdomain}.${domain}"
+        - {
+            subdomain: !Ref Subdomain,
+            domain: !Ref DomainName
+          }
