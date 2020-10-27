@@ -31,7 +31,8 @@ module.exports = {
 	plugins: [
     new CopyPlugin({
       patterns: [
-        { from: 'src/public' }
+        { from: path.join(__dirname, 'package.json'), to: path.join(__dirname, 'dist') },
+        { from: path.join(__dirname, 'src', 'public'), to: path.join(__dirname, 'dist', 'public') }
       ],
     })
   ]
